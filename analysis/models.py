@@ -71,6 +71,7 @@ class Incident(models.Model):
     severity = models.IntegerField(default=1)  # 1 (low) to 5 (critical)
     alert_message = models.TextField(null=True, blank=True)
     is_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.incident_type} at {self.timestamp} by device {self.device_id}"
@@ -130,3 +131,13 @@ class Alert(models.Model):
     
     def __str__(self):
         return f"{self.get_alert_level_display()} alert: {self.message[:50]}..."
+
+
+class ChatMessage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    conversation = models.JSONField(default=list)
+    created_at = models. DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f'ChatSession {self.id}- {self.user.username}'

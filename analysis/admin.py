@@ -1,6 +1,8 @@
 from django.contrib import admin
 from .models import Neighborhood, SecurityDevice,\
-     Incident, Evidence, AIAnalysis, Alert, User
+     Incident, Evidence, AIAnalysis, Alert, User, ChatMessage
+
+admin.site.register(ChatMessage)
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):

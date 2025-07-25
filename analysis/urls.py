@@ -6,8 +6,8 @@ from .views import (
     SecurityDeviceViewSet,
     IncidentReportViewSet,
     EvidenceViewSet,
-    AIAnalysisViewSet,
-    AlertViewSet,
+    AIAnalysisViewSet,safehaven_analysis_page,
+    AlertViewSet,safehaven_analysis_view,
     UserViewSet,CustomObtainTokenPairView
 )
 
@@ -25,7 +25,12 @@ router.register(r'users', UserViewSet,)
 
 urlpatterns = [
     path("token/request/", CustomObtainTokenPairView.as_view(), name="token_request"),
+    # path('detection-status/', DetectionStatusView.as_view(), name='detection-status'),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"), 
+    path("api/analysis/", safehaven_analysis_view, name="safehaven_analysis"),
+    path('dashboard/', safehaven_analysis_page, name='dashboard'),
+    # path('start-detection/', StartDetectionView.as_view(), name='start-detection'),
+    # path('stop-detection/', StopDetectionView.as_view(), name='stop-detection'),
 ]
 
 urlpatterns += router.urls

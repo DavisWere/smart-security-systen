@@ -147,4 +147,7 @@ class AlertSerializer(serializers.ModelSerializer):
 
 
 
-   
+class ChatMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatMessage
+        fields = '__all__'
