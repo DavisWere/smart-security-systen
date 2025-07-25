@@ -1,5 +1,14 @@
 from django.contrib import admin
-from .models import Neighborhood, SecurityDevice, IncidentReport, Evidence, AIAnalysis, Alert
+from .models import Neighborhood, SecurityDevice,\
+     IncidentReport, Evidence, AIAnalysis, Alert, User
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'first_name', 'last_name', 'role','username')
+    search_fields = ('username', 'role')
+    list_filter = ('created_at',)
+
+
 
 @admin.register(Neighborhood)
 class NeighborhoodAdmin(admin.ModelAdmin):

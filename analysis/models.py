@@ -2,6 +2,17 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 
+class User(AbstractUser):
+    first_name = models.CharField(max_length=40, null=False)
+    last_name = models.CharField(max_length=40, null=False)
+    department = models.CharField(max_length=255, null=False)
+    role = models.CharField(max_length=255, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)  
+    updated_at = models.DateTimeField(auto_now=True)  
+
+    def __str__(self):
+        return self.username
+    
 
 
 class Neighborhood(models.Model):
@@ -59,7 +70,6 @@ class Evidence(models.Model):
         ('AUDIO', 'Audio'),
         ('VIDEO', 'Video'),
     ]
-    
     incident = models.ForeignKey(IncidentReport, on_delete=models.CASCADE, related_name='evidences')
     evidence_type = models.CharField(max_length=5, choices=EVIDENCE_TYPES)
     file = models.FileField(upload_to='evidence/%Y/%m/%d/')
