@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Neighborhood, SecurityDevice,\
-     IncidentReport, Evidence, AIAnalysis, Alert, User
+     Incident, Evidence, AIAnalysis, Alert, User
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -23,9 +23,9 @@ class SecurityDeviceAdmin(admin.ModelAdmin):
     search_fields = ('device_id', 'location')
     list_editable = ('is_active',)
 
-@admin.register(IncidentReport)
+@admin.register(Incident)
 class IncidentReportAdmin(admin.ModelAdmin):
-    list_display = ('id', 'get_incident_type_display', 'device', 'timestamp', 'severity', 'is_verified')
+    list_display = ('id', 'incident_type', 'device_type', 'timestamp', 'severity', 'is_verified')
     list_filter = ('incident_type', 'timestamp', 'is_verified')
     search_fields = ('description',)
     date_hierarchy = 'timestamp'

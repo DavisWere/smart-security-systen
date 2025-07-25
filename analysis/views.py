@@ -2,11 +2,11 @@ from rest_framework import viewsets, permissions
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Neighborhood, SecurityDevice, \
-    IncidentReport, Evidence, AIAnalysis, Alert,User
+    Incident, Evidence, AIAnalysis, Alert,User
 from .serializers import (
     NeighborhoodSerializer,UserSerializer,
     SecurityDeviceSerializer,
-    IncidentReportSerializer,
+    IncidentSerializer,
     EvidenceSerializer,
     AIAnalysisSerializer,
     AlertSerializer, CustomTokenObtainPairSerializer
@@ -45,8 +45,8 @@ class SecurityDeviceViewSet(viewsets.ModelViewSet):
     permission_classes = []
 
 class IncidentReportViewSet(viewsets.ModelViewSet):
-    queryset = IncidentReport.objects.all().order_by('-timestamp')
-    serializer_class = IncidentReportSerializer
+    queryset = Incident.objects.all().order_by('-timestamp')
+    serializer_class = IncidentSerializer
     authentication_classes = []
     permission_classes = []
 
@@ -102,3 +102,5 @@ class AlertViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(incident_id=incident_id)
             
         return queryset
+
+

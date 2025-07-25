@@ -64,35 +64,31 @@ class UserSerializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
-
-class IncidentReportSerializer(serializers.ModelSerializer):
-    incident_type = serializers.CharField(max_length=100)  # Override to allow any value
-    
+class IncidentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = IncidentReport
+        model = Incident
         fields = '__all__'
-    
+
     def validate_incident_type(self, value):
         """
-        Validate incident_type but allow any value (not just the choices)
+        Normalize and clean incident_type.
         """
-        # You can add any custom validation here if needed
-        return value.strip().upper()  # Convert to uppercase for consistency
-    
+        return value.strip().upper()
+
     def to_representation(self, instance):
         """
-        Custom representation to show both the stored value and display value
+        Customize how incident_type and device_type are displayed.
         """
         representation = super().to_representation(instance)
-        # Get the display value for known types
-        if instance.incident_type in dict(IncidentReport.INCIDENT_TYPES):
-            representation['incident_type_display'] = dict(IncidentReport.INCIDENT_TYPES).get(
-                instance.incident_type, instance.incident_type
-            )
-        else:
-            representation['incident_type_display'] = instance.incident_type
+
+        incident_type_display = instance.incident_type
+        if incident_type_display:
+            incident_type_display = incident_type_display.replace('_', ' ').title()
+
+        representation['incident_type_display'] = incident_type_display
         return representation
-    
+
+ 
 class NeighborhoodSerializer(serializers.ModelSerializer):
     class Meta:
         model= Neighborhood
@@ -109,7 +105,7 @@ class IncidentReportSerializer(serializers.ModelSerializer):
     evidences = serializers.SerializerMethodField()
     
     class Meta:
-        model = IncidentReport
+        model = Incident
         fields = '__all__'
         read_only_fields = ['timestamp']
     
@@ -117,7 +113,7 @@ class IncidentReportSerializer(serializers.ModelSerializer):
         return EvidenceSerializer(obj.evidences.all(), many=True, context=self.context).data
 
 class EvidenceSerializer(serializers.ModelSerializer):
-    incident = serializers.PrimaryKeyRelatedField(queryset=IncidentReport.objects.all())
+    incident = serializers.PrimaryKeyRelatedField(queryset=Incident.objects.all())
     ai_analyses = serializers.SerializerMethodField()
     
     class Meta:
@@ -141,7 +137,7 @@ class AIAnalysisSerializer(serializers.ModelSerializer):
         return f"{obj.confidence:.0%}"
 
 class AlertSerializer(serializers.ModelSerializer):
-    incident = serializers.PrimaryKeyRelatedField(queryset=IncidentReport.objects.all())
+    incident = serializers.PrimaryKeyRelatedField(queryset=Incident.objects.all())
     alert_level_display = serializers.CharField(source='get_alert_level_display', read_only=True)
     
     class Meta:

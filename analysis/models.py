@@ -43,25 +43,38 @@ class SecurityDevice(models.Model):
     def __str__(self):
         return f"{self.get_device_type_display()} ({self.device_id})"
 
-class IncidentReport(models.Model):
-    """Reports from the Tkinter app (both automatic and manual)"""
-    INCIDENT_TYPES = [
-        ('SOUND', 'Loud Noise'),
-        ('MOTION', 'Suspicious Motion'),
-        ('THEFT', 'Theft'),
-        ('VANDALISM', 'Vandalism'),
-        ('OTHER', 'Other'),
-    ]
-    
-    device = models.ForeignKey(SecurityDevice, on_delete=models.SET_NULL, null=True)
-    incident_type = models.CharField(max_length=10, choices=INCIDENT_TYPES)
+
+class Incident(models.Model):
+    """Unified incident model for reports, devices, media, and AI analysis."""
+
+    # Basic incident info
+    incident_type = models.CharField(max_length=400, null=True, blank=True)
     description = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
+
+    # Device info
+    device_id = models.CharField(max_length=50)  # Unique identifier from the Tkinter app
+    device_type = models.CharField(max_length=10, null=True, blank=True)  # e.g., CAM, MIC
+    device_location = models.CharField(max_length=200, null=True, blank=True)
+
+    # Optional neighborhood context
+    neighborhood = models.CharField(max_length=100, null=True, blank=True)
+
+    # Media evidence
+    evidence_file = models.FileField(upload_to='evidence/%Y/%m/%d/', null=True, blank=True)
+    evidence_type = models.CharField(max_length=10, null=True, blank=True)  # IMAGE, AUDIO, VIDEO
+
+    # AI analysis will be updated later
+    ai_analysis = models.JSONField(null=True, blank=True)
+
+    # Alerting and severity
+    severity = models.IntegerField(default=1)  # 1 (low) to 5 (critical)
+    alert_message = models.TextField(null=True, blank=True)
     is_verified = models.BooleanField(default=False)
-    severity = models.IntegerField(default=1)  # 1-5 scale
-    
+
     def __str__(self):
-        return f"{self.get_incident_type_display()} at {self.timestamp}"
+        return f"{self.incident_type} at {self.timestamp} by device {self.device_id}"
+
 
 class Evidence(models.Model):
     """Media evidence associated with incidents"""
@@ -70,7 +83,7 @@ class Evidence(models.Model):
         ('AUDIO', 'Audio'),
         ('VIDEO', 'Video'),
     ]
-    incident = models.ForeignKey(IncidentReport, on_delete=models.CASCADE, related_name='evidences')
+    incident = models.ForeignKey(Incident, on_delete=models.CASCADE, related_name='evidences')
     evidence_type = models.CharField(max_length=5, choices=EVIDENCE_TYPES)
     file = models.FileField(upload_to='evidence/%Y/%m/%d/')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -109,7 +122,7 @@ class Alert(models.Model):
         ('CRITICAL', 'Critical'),
     ]
     
-    incident = models.ForeignKey(IncidentReport, on_delete=models.CASCADE)
+    incident = models.ForeignKey(Incident, on_delete=models.CASCADE)
     alert_level = models.CharField(max_length=10, choices=ALERT_LEVELS)
     message = models.TextField()
     is_resolved = models.BooleanField(default=False)
