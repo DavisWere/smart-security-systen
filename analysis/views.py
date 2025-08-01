@@ -1,7 +1,8 @@
 from rest_framework import viewsets, permissions
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 import time
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -21,7 +22,7 @@ import json
 from django.http import JsonResponse
 import requests
 import os
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 class CustomObtainTokenPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
@@ -239,3 +240,23 @@ def safehaven_analysis_page(request):
     }
     
     return render(request, 'dashboard.html', context)
+
+def home(request):
+    return render(request, 'home.html')
+
+
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('dashboard')
+
+        else:
+            messages.error(request, "Invalid username or password")
+
+    return render(request, "login.html")    

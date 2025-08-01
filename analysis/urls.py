@@ -5,10 +5,10 @@ from .views import (
     NeighborhoodViewSet,
     SecurityDeviceViewSet,
     IncidentReportViewSet,
-    EvidenceViewSet,
+    EvidenceViewSet,login_view,
     AIAnalysisViewSet,safehaven_analysis_page,
     AlertViewSet,safehaven_analysis_view,
-    UserViewSet,CustomObtainTokenPairView
+    UserViewSet,CustomObtainTokenPairView,home
 )
 
 router = DefaultRouter()
@@ -29,6 +29,8 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"), 
     path("api/analysis/", safehaven_analysis_view, name="safehaven_analysis"),
     path('dashboard/', safehaven_analysis_page, name='dashboard'),
+    path('', home, name='home'),
+    path('login/', login_view, name='login'),
     # path('start-detection/', StartDetectionView.as_view(), name='start-detection'),
     # path('stop-detection/', StopDetectionView.as_view(), name='stop-detection'),
 ]

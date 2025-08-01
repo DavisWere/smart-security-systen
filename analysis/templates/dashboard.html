@@ -225,8 +225,68 @@
     <div id="action-links">
         <a href="#">Logout</a>
         <a href="#">Print Report</a>
-        <a href="#">Settings</a>
+    
+        <div class="dropdown">
+            <a href="#">Settings</a>
+            <div class="dropdown-content">
+                <a href="#">Add User</a>
+                <a href="#">Edit Profile</a>
+            </div>
+        </div>
     </div>
+
+<style>
+    #action-links {
+        display: flex;
+        gap: 20px;
+        position: relative;
+        font-family: Arial, sans-serif;
+        align-content: center;
+    }
+
+    #action-links a {
+        text-decoration: none;
+        color: #333;
+        padding: 8px 12px;
+        background: #f0f0f0;
+        border-radius: 5px;
+    }
+
+    #action-links a:hover {
+        background: #ddd;
+    }
+
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        z-index: 1;
+    }
+
+    .dropdown-content a {
+        display: block;
+        padding: 10px;
+        color: #333;
+        background: white;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #eee;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+</style>
 
 </head>
 
