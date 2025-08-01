@@ -24,7 +24,7 @@ class CustomUserCreationForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ("username", "email", "first_name", "last_name", 
-                       "phone_number", "role"    
+                       "department", "role"    
                        )
 
     def clean_password2(self):
@@ -50,7 +50,8 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             "classes": ("wide",),
-            "fields": ("username", "email", "first_name", "last_name", "phone_number", "role",
+            "fields": ("username", "email", "first_name", "last_name",  "role",
+                       'department',
                        "password1", "password2"),
         }),
     )
