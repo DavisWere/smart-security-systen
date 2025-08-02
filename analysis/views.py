@@ -5,8 +5,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-
-from weasyprint import HTML
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+from io import BytesIO
 import tempfile
 import time
 from .forms import RegistrationForm, EditProfileForm
@@ -335,7 +336,7 @@ def user_list_view(request):
 def generate_incident_report(request):
     incidents = Incident.objects.all().order_by('-timestamp')
 
-    html_string = render_to_string('incident_report.html', {
+    html = render_to_string('incident_report.html', {
         'incidents': incidents,
         'image_path': request.build_absolute_uri('/evidence/d36dccf8-4255-4b4f-9570-b1bd740f1236.png'),
     })
@@ -343,9 +344,11 @@ def generate_incident_report(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename="incident_report.pdf"'
 
-    with tempfile.NamedTemporaryFile(delete=True) as tmp_file:
-        HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf(tmp_file.name)
-        tmp_file.seek(0)
-        response.write(tmp_file.read())
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
 
-    return response
+    if not pdf.err:
+        response.write(result.getvalue())
+        return response
+    else:
+        return HttpResponse('Error generating PDF', status=500)
