@@ -2,13 +2,13 @@ from rest_framework.routers import DefaultRouter
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
-    NeighborhoodViewSet,
-    SecurityDeviceViewSet,
-    IncidentReportViewSet,
-    EvidenceViewSet,login_view,
+    NeighborhoodViewSet,edit_user,
+    SecurityDeviceViewSet,logout_view,
+    IncidentReportViewSet, user_list_view,
+    EvidenceViewSet,login_view,delete_user_view,
     AIAnalysisViewSet,safehaven_analysis_page,
     AlertViewSet,safehaven_analysis_view,
-    UserViewSet,CustomObtainTokenPairView,home
+    UserViewSet,CustomObtainTokenPairView,home, register_user
 )
 
 router = DefaultRouter()
@@ -31,6 +31,11 @@ urlpatterns = [
     path('dashboard/', safehaven_analysis_page, name='dashboard'),
     path('', home, name='home'),
     path('login/', login_view, name='login'),
+    path("add/user/", register_user, name="add_user"),
+    path('logout/', logout_view, name='logout'),
+    path('users/edit/<int:user_id>/', edit_user, name='edit_user'),
+    path('users/', user_list_view, name='user_list'),
+    path('users/delete/<int:user_id>/', delete_user_view, name='delete_user'),
     # path('start-detection/', StartDetectionView.as_view(), name='start-detection'),
     # path('stop-detection/', StopDetectionView.as_view(), name='stop-detection'),
 ]

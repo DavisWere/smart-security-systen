@@ -1,9 +1,10 @@
 from rest_framework import viewsets, permissions
 from django.utils import timezone
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 import time
+from .forms import RegistrationForm, EditProfileForm
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Neighborhood, SecurityDevice, \
@@ -22,7 +23,7 @@ import json
 from django.http import JsonResponse
 import requests
 import os
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect , get_object_or_404
 
 class CustomObtainTokenPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
@@ -260,3 +261,60 @@ def login_view(request):
             messages.error(request, "Invalid username or password")
 
     return render(request, "login.html")    
+
+
+def register_user(request):
+    if request.method == "POST":
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("login")
+    else:
+        form = RegistrationForm()
+    
+    return render(request, "add_user.html", {"form": form})
+
+def logout_view(request):
+    logout(request)  
+    return redirect('/') 
+
+def is_admin(user):
+    return user.is_superuser or user.role.lower() == 'admin'
+
+@login_required
+@user_passes_test(is_admin)
+def edit_user(request, user_id):
+    user_obj = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=user_obj)
+        if form.is_valid():
+            form.save()
+            return redirect('user_list')
+    else:
+        form = EditProfileForm(instance=user_obj)
+    return render(request, 'edit_user.html', {'form': form, 'user_obj': user_obj})
+
+
+
+@login_required
+@user_passes_test(is_admin)
+def delete_user_view(request, user_id):
+    user_to_delete = get_object_or_404(User, id=user_id)
+
+    if user_to_delete == request.user:
+        messages.error(request, "You cannot delete your own account.")
+        return redirect('login')
+    else:
+        user_to_delete.delete()
+        messages.success(request, "User deleted successfully.")
+    
+    return redirect('dashboard') 
+
+def is_admin(user):
+    return user.is_superuser or user.role.lower() == 'admin'
+
+@login_required
+@user_passes_test(is_admin)
+def user_list_view(request):
+    users = User.objects.all()
+    return render(request, 'user_list.html', {'users': users})
