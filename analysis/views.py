@@ -268,7 +268,7 @@ def register_user(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("login")
+            return redirect("user_list")
     else:
         form = RegistrationForm()
     
@@ -308,7 +308,7 @@ def delete_user_view(request, user_id):
         user_to_delete.delete()
         messages.success(request, "User deleted successfully.")
     
-    return redirect('dashboard') 
+    return redirect('user_list') 
 
 def is_admin(user):
     return user.is_superuser or user.role.lower() == 'admin'

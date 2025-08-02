@@ -1,0 +1,9 @@
+<h2>Add New User</h2>
+
+<a href="{% url 'user_list' %}">← Back to User List</a>
+
+<form method="post">
+    {% csrf_token %}    
+    {{ form.as_p }}
+    <button type="submit">Add User</button>
+</form>
