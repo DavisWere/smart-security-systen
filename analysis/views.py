@@ -316,5 +316,11 @@ def is_admin(user):
 @login_required
 @user_passes_test(is_admin)
 def user_list_view(request):
-    users = User.objects.all()
+    user = request.user  # Fix: reference the logged-in user
+
+    if is_admin(user):
+        users = User.objects.all()
+    else:
+        users = User.objects.filter(id=user.id)
+
     return render(request, 'user_list.html', {'users': users})
