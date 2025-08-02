@@ -284,11 +284,9 @@ def logout_view(request):
     logout(request)  
     return redirect('/') 
 
-def is_admin(user):
-    return user.is_superuser or user.role.lower() == 'admin'
+
 
 @login_required
-@user_passes_test(is_admin)
 def edit_user(request, user_id):
     user_obj = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
@@ -303,7 +301,6 @@ def edit_user(request, user_id):
 
 
 @login_required
-@user_passes_test(is_admin)
 def delete_user_view(request, user_id):
     user_to_delete = get_object_or_404(User, id=user_id)
 
@@ -320,7 +317,6 @@ def is_admin(user):
     return user.is_superuser or user.role.lower() == 'admin'
 
 @login_required
-@user_passes_test(is_admin)
 def user_list_view(request):
     user = request.user  # Fix: reference the logged-in user
 
