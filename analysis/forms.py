@@ -1,7 +1,7 @@
 from django import forms
 from .models import User
-
 from django.contrib.auth.forms import UserCreationForm
+
 class RegistrationForm(UserCreationForm):
     class Meta:
         model = User
@@ -12,3 +12,16 @@ class RegistrationForm(UserCreationForm):
         if commit:
             user.save()
         return user  
+
+class EditProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'department', 'role']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'department': forms.TextInput(attrs={'class': 'form-control'}),
+            'role': forms.TextInput(attrs={'class': 'form-control'}),
+        }
