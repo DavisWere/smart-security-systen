@@ -30,6 +30,7 @@ from django.http import JsonResponse
 import requests
 import os
 from django.shortcuts import render, redirect , get_object_or_404
+from .forms import EvidenceUploadForm, ManualAnalysisForm
 
 class CustomObtainTokenPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
@@ -348,3 +349,61 @@ def generate_incident_report(request):
         return response
     else:
         return HttpResponse('Error generating PDF', status=500)
+    
+def responder_dashboard(request):
+    """Simple dashboard for responder to view all incidents and go to actions page."""
+    incidents = Incident.objects.all().order_by('-created_at')
+    return render(request, 'responder_dashboard.html', {'incidents': incidents})
+
+
+@login_required
+def responder_actions(request, incident_id):
+    """Responder can approve, delete AI analysis, upload new evidence, or replace analysis."""
+    incident = get_object_or_404(Incident, id=incident_id)
+
+    if request.method == "POST":
+        # Approve AI analysis
+        if 'approve' in request.POST:
+            incident.is_verified = True
+            incident.alert_message = "Verified by responder."
+            incident.save()
+            messages.success(request, "Incident verified successfully.")
+
+        # Delete AI analysis
+        elif 'delete_analysis' in request.POST:
+            incident.ai_analysis = None
+            incident.alert_message = "AI analysis deleted by responder."
+            incident.save()
+            messages.warning(request, "AI analysis deleted.")
+
+        # Upload or replace evidence
+        elif 'upload_evidence' in request.POST:
+            form = EvidenceUploadForm(request.POST, request.FILES, instance=incident)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Evidence uploaded/replaced successfully.")
+            else:
+                messages.error(request, "Error uploading evidence.")
+
+        # Replace AI analysis with manual text
+        elif 'manual_analysis' in request.POST:
+            form = ManualAnalysisForm(request.POST, instance=incident)
+            if form.is_valid():
+                incident.ai_analysis = {"manual_text": form.cleaned_data['manual_text']}
+                incident.alert_message = "Manual analysis provided by responder."
+                incident.save()
+                messages.success(request, "Manual analysis saved successfully.")
+            else:
+                messages.error(request, "Error saving manual analysis.")
+
+        return redirect('incident_action', incident_id=incident.id)
+
+    # Forms for evidence upload and manual analysis
+    evidence_form = EvidenceUploadForm(instance=incident)
+    manual_form = ManualAnalysisForm()
+
+    return render(request, 'responder_actions.html', {
+        'incident': incident,
+        'evidence_form': evidence_form,
+        'manual_form': manual_form
+    })

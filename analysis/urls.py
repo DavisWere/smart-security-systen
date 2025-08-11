@@ -3,11 +3,11 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     NeighborhoodViewSet,edit_user,generate_incident_report,
-    SecurityDeviceViewSet,logout_view,
+    SecurityDeviceViewSet,logout_view,responder_dashboard,
     IncidentReportViewSet, user_list_view,
     EvidenceViewSet,login_view,delete_user_view,
     AIAnalysisViewSet,safehaven_analysis_page,
-    AlertViewSet,safehaven_analysis_view,
+    AlertViewSet,safehaven_analysis_view,responder_actions,
     UserViewSet,CustomObtainTokenPairView,home, register_user
 )
 
@@ -37,6 +37,8 @@ urlpatterns = [
     path('users/', user_list_view, name='user_list'),
     path('users/delete/<int:user_id>/', delete_user_view, name='delete_user'),
     path('report/pdf/', generate_incident_report, name='generate_incident_report'),
+    path("responder/dashboard/", responder_dashboard, name="responder_dashboard"),
+    path("incident/<int:incident_id>/action/", responder_actions, name="incident_action"),
     # path('start-detection/', StartDetectionView.as_view(), name='start-detection'),
     # path('stop-detection/', StopDetectionView.as_view(), name='stop-detection'),
 ]
